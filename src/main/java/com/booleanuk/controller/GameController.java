@@ -1,8 +1,9 @@
 // GameController.java
 package com.booleanuk.controller;
 
-import com.booleanuk.model.Game;
+import com.booleanuk.model.Player;
 import com.booleanuk.service.GameService;
+import com.booleanuk.model.Game; // Add this import
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,16 +35,21 @@ public class GameController {
     }
 
     @PostMapping("/placeShip")
-    public String placeShip(@RequestParam int x, @RequestParam int y, @RequestParam int length, @RequestParam boolean horizontal) {
-        return gameService.placeShip(x, y, length, horizontal);
+    public String placeShip(@RequestParam String playerName, @RequestParam int x, @RequestParam int y, @RequestParam int length, @RequestParam boolean horizontal) {
+        return gameService.placeShip(playerName, x, y, length, horizontal);
     }
 
     @PostMapping("/attack")
-    public String attack(@RequestParam int x, @RequestParam int y) {
+    public String attack(@RequestParam String playerName, @RequestParam int x, @RequestParam int y) {
         try {
-            return gameService.attack(x, y);
+            return gameService.attack(playerName, x, y);
         } catch (IllegalStateException e) {
             return e.getMessage();
         }
+    }
+
+    @GetMapping("/boards")
+    public Player getPlayerBoards(@RequestParam String playerName) {
+        return gameService.getPlayerBoards(playerName);
     }
 }

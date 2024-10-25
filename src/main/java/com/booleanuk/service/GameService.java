@@ -26,15 +26,47 @@ public class GameService {
         this.game = new Game();
     }
 
-    public String placeShip(int x, int y, int length, boolean horizontal) {
-        boolean success = game.getBoard().placeShip(x, y, length, horizontal);
-        return success ? "Ship placed successfully." : "Failed to place ship.";
+    public String placeShip(String playerName, int x, int y, int length, boolean horizontal) {
+        Player player = game.getPlayers().stream()
+                .filter(p -> p.getName().equals(playerName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Player not found"));
+
+        boolean success = player.getOwnBoard().placeShip(x, y, length, horizontal);
+        if (success) {
+            player.incrementShipsPlaced();
+            return "Ship placed successfully.";
+        } else {
+            return "Failed to place ship.";
+        }
     }
 
-    public String attack(int x, int y) {
-        boolean hit = game.getBoard().attack(x, y);
+    public String attack(String playerName, int x, int y) {
+        if (!game.allShipsPlaced()) {
+            return "All players must place 3 ships before starting the game.";
+        }
+
+        Player attacker = game.getPlayers().stream()
+                .filter(p -> p.getName().equals(playerName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Player not found"));
+
+        Player opponent = game.getPlayers().stream()
+                .filter(p -> !p.getName().equals(playerName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Opponent not found"));
+
+        boolean hit = opponent.getOwnBoard().attack(x, y);
+        attacker.getAttackBoard().getGrid()[x][y] = hit ? 'H' : 'M';
         String result = hit ? "Hit!" : "Miss!";
         game.switchTurn();
         return result;
+    }
+
+    public Player getPlayerBoards(String playerName) {
+        return game.getPlayers().stream()
+                .filter(p -> p.getName().equals(playerName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Player not found"));
     }
 }

@@ -6,23 +6,17 @@ import java.util.List;
 
 public class Game {
     private List<Player> players;
-    private Board board;
     private boolean isGameOver;
     private int currentPlayerIndex;
 
     public Game() {
         this.players = new ArrayList<>();
-        this.board = new Board();
         this.isGameOver = false;
         this.currentPlayerIndex = 0;
     }
 
     public List<Player> getPlayers() {
         return players;
-    }
-
-    public Board getBoard() {
-        return board;
     }
 
     public boolean isGameOver() {
@@ -47,5 +41,9 @@ public class Game {
 
     public void switchTurn() {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+    }
+
+    public boolean allShipsPlaced() {
+        return players.stream().allMatch(player -> player.getShipsPlaced() >= 3);
     }
 }
